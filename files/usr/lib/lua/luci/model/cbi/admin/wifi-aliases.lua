@@ -1,6 +1,6 @@
 local uci = luci.model.uci.cursor()
 
-local ssid = uci:get('wireless', 'alias', 'ssid')
+local ssid = uci:get('wireless', 'alias_ssid')
 local f = SimpleForm("wifi alias", translate("WiFi alias"))
 
 
@@ -10,8 +10,7 @@ local s = f:section(SimpleSection, nil, translate((
 
 
 o = s:option(Flag, "enabled", translate("Enabled"))
-
-local enabled = ((ssid and not uci:get('wireless', 'alias', 'disabled')))
+local enabled = ((ssid and not uci:get_bool('wireless', 'alias_disabled')))
 o.default = (enabled and o.enabled or o.disabled)
 o.rmempty = false
 
@@ -22,11 +21,11 @@ o.default = ssid
 
 function f.handle(self, state, data)
    if state == FORM_VALID then
-      if data.enabled == 1 then
-         uci:set('wireless', 'alias', 'ssid', ssid)
-	 uci:set('wireless', 'alias', 'disabled', 0)
+      if data.enabled == '1' then
+         uci:set('wireless', 'alias_ssid', data.ssid)
+	 uci:set('wireless', 'alias_disabled', 0)
       else
-	 uci:set('wireless', 'alias', 'disabled', 1)
+	 uci:set('wireless', 'alias_disabled', 1)
       end
       uci:save('wireless')
       uci:commit('wireless')
